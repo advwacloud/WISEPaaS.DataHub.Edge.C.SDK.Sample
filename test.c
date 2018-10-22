@@ -1,19 +1,67 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <dlfcn.h>
+#include <string.h>
 
 #include "WISEPaaS.h"
 
+int nsleep(long miliseconds)
+{
+   struct timespec req, rem;
+
+   if(miliseconds > 999)
+   {   
+        req.tv_sec = (int)(miliseconds / 1000);                            /* Must be Non-Negative */
+        req.tv_nsec = (miliseconds - ((long)req.tv_sec * 1000)) * 1000000; /* Must be in range of 0 to 999999999 */
+   }   
+   else
+   {   
+        req.tv_sec = 0;                         /* Must be Non-Negative */
+        req.tv_nsec = miliseconds * 1000000;    /* Must be in range of 0 to 999999999 */
+   }   
+   return nanosleep(&req , &rem);
+}
+
+bool IsConnected = false;
+
+void edgeAgent_Connected(){
+    printf("Connect success\n");
+    IsConnected = true;
+}
+
+void edgeAgent_Disconnected(){
+    printf("Disconnected\n");
+    IsConnected = false;
+}
+
+void edgeAgent_Recieve(char *cmd, char *val){
+
+    if(strcmp(cmd, WirteValueCommand) == 0){
+        printf("write value: %s\n", val);
+    }
+    else if(strcmp(cmd, WriteConfigCommand) == 0){
+        printf("write config: %s\n", val);
+    }
+}
+
 int main(int argc, char *argv[]) {
 
-    int (*Constructor)(TOPTION_STRUCT);
-    int (*Connect)();
-    int (*Disconnect)();
-    int (*UploadConfig)();
-    int (*SendData)();
-    int (*SendDeviceStatus)();
-    
+/*  load library */
+    void (*SetConnectEvent)();
+    void (*SetDisconnectEvent)();
+    void (*SetMessageReceived)();
+    void (*Constructor)(TOPTION_STRUCT);
+    void (*Connect)();
+    void (*Disconnect)();
+    int (*UploadConfig)(ActionType, TSCADA_CONFIG_STRUCT);
+    int (*SendData)(TEDGE_DATA_STRUCT);
+    int (*SendDeviceStatus)(TEDGE_DEVICE_STATUS_STRUCT);
+
     char *error;
 
     void *handle;
@@ -23,6 +71,11 @@ int main(int argc, char *argv[]) {
         fputs (dlerror(), stderr);
         exit(1);
     }
+
+    SetConnectEvent = dlsym(handle, "SetConnectEvent");
+    SetDisconnectEvent = dlsym(handle, "SetDisconnectEvent");
+    SetMessageReceived = dlsym(handle, "SetMessageReceived");
+
     Constructor = dlsym(handle, "Constructor");
     Connect = dlsym(handle, "Connect");
     Disconnect = dlsym(handle, "Disconnect");
@@ -35,24 +88,21 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+/*  Set Event */
+    SetConnectEvent(edgeAgent_Connected);
+    SetDisconnectEvent(edgeAgent_Disconnected);
+    SetMessageReceived(edgeAgent_Recieve);
+
+/*  Set Construct */
 	TOPTION_STRUCT options;
 	options.AutoReconnect = true;
 	options.ReconnectInterval = 1000;
 	options.ScadaId = "c9851920-ca7f-4cfd-964a-1969aef958f6";
 	options.Heartbeat = 60;
 	options.DataRecover = true;
-	options.ConnectType = DCCS; // ?
+	options.ConnectType = DCCS; 
     options.Type = Gatway;
 	options.UseSecure = false;
-
-    TMQTT_OPTION_STRUCT mqtt;
- 
-    mqtt.HostName = "127.0.0.1";
-    mqtt.Username = "";
-    mqtt.Password = "";
-    mqtt.ProtocolType = TCP;
-
-    options.MQTT = mqtt;
 
     switch (options.ConnectType)
 	{
@@ -70,8 +120,9 @@ int main(int argc, char *argv[]) {
 			break;
 	}
 
+/*  Set Config */
     TSCADA_CONFIG_STRUCT config;
-    ActionType action = Delete;
+    ActionType action = Create;
 
     config.Id = options.ScadaId; 
     config.Description = "description";
@@ -176,13 +227,7 @@ int main(int argc, char *argv[]) {
     config.DeviceNumber = device_num;
     config.DeviceList = device;   
 
-    Constructor(options);
-
-	Connect();
-
-    sleep(1);
-    UploadConfig(action, config);
- 
+/* Set Device Status */
     TEDGE_DEVICE_STATUS_STRUCT status;
     status.DeviceNumber = device_num;
 
@@ -195,20 +240,28 @@ int main(int argc, char *argv[]) {
 
     status.DeviceList = dev_list;
 
-    SendDeviceStatus(status);
- 
+
+/* Set Data Content */
     int tag_num = 100;
     TEDGE_DATA_STRUCT data;
 
     PTEDGE_DEVICE_STRUCT data_device = malloc(device_num * sizeof(struct EDGE_DEVICE_STRUCT));
     PTEDGE_TAG_STRUCT data_tag = malloc(tag_num * sizeof(struct EDGE_TAG_STRUCT));
 
-    int value = 0;
+/* Use SDK API */
+    Constructor(options);
+	Connect();
+
+    nsleep(2000);
     
+    UploadConfig(action, config);
+    SendDeviceStatus(status);
+ 
+    int value = 0; 
     while(1){
         if(value >=1000){value =0;}
         value ++;
-        sleep(1);
+        nsleep(1000);
 
         for(int i = 0; i < device_num; i++){
             for ( int j = 0; j < tag_num; j++ ){
@@ -231,6 +284,7 @@ int main(int argc, char *argv[]) {
         SendData(data);
     }
     
+/* release */
     free(device);
     free(analogTag);
     free(discreteTag);
@@ -240,8 +294,6 @@ int main(int argc, char *argv[]) {
     free(simDevId);
     free(simDevName);
     free(simValue);
-
-    while(1){}
 
     dlclose(handle);
 

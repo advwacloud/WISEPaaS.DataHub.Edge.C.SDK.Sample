@@ -9,7 +9,11 @@ char * LastWillMessage();
 
 char * DisconnectMessage();
 
+void HearbeatMessage(char **payload);
+
 void ParseConnectJson(bool secure, char *pMsg, char **host, char **user, char **pwd, int *port);
+
+void ParseEventJson(char *pMsg, char **pCmd, char **pVal);
 
 int DeviceStatusMessage(TEDGE_DEVICE_STATUS_STRUCT data, char **payload);
 

@@ -7,6 +7,7 @@
 #include "EDGE_AGENT_OPTION.h"
 #include "EDGE_CONFIG.h"
 #include "EDGE_DATA.h"
+#include "EDGE_DEVICE_STATUS.h"
 #include "CONST.h"
 
 // 3rd
@@ -17,5 +18,4 @@
 //#include "cJSON.h"
 
 //#include "EDGE_DATA.h"
-
 #endif

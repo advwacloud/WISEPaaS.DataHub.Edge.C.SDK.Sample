@@ -18,6 +18,9 @@ const char *DeleteSql = "DELETE FROM Data WHERE id IN %d";
 const int hbt_sec = 1;
 const int rcov_sec = 2;
 
+const char *WirteValueCommand = "WV";
+const char *WriteConfigCommand = "WC";
+
 //#define MAX_TOPIC 100
 
 #endif
