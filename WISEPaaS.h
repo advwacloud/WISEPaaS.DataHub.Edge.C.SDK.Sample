@@ -4,11 +4,17 @@
 #include "inc/EDGE_INC.h"
 #include "inc/curl/curl.h"
 
-int Constructor(TOPTION_STRUCT option);
+void SetConnectEvent(void (*callback)(void));
 
-int Connect();
+void SetDisconnectEvent(void (*callback)(void));
 
-int Disconnect();
+void SetMessageReceived(void (*callback)(char *cmd, char *val));
+
+void Constructor(TOPTION_STRUCT option);
+
+void Connect();
+
+void Disconnect();
 
 int UploadConfig(ActionType action, TSCADA_CONFIG_STRUCT edgeConfig);
     
