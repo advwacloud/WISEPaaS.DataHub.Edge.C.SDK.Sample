@@ -160,15 +160,6 @@ int main(int argc, char *argv[]) {
             // analogTag[j].EngineerUnit = "enuit";
             // analogTag[j].IntegerDisplayFormat = 4;
             // analogTag[j].FractionDisplayFormat = 2;
-            // analogTag[j].HHPriority = 1;
-            // analogTag[j].HHAlarmLimit = 1;
-            // analogTag[j].HighPriority = 1;
-            // analogTag[j].HighAlarmLimit = 1;
-            // analogTag[j].LowPriority = 1;
-            // analogTag[j].LowAlarmLimit = 1;
-            // analogTag[j].LLPriority = 1;
-            // analogTag[j].LLAlarmLimit = 1;
-            // analogTag[j].NeedLog = true;
         }    
         for ( int j = 0; j < discrete_tag_num; j++ )
         {
@@ -186,14 +177,6 @@ int main(int argc, char *argv[]) {
             // discreteTag[j].State5 = "";
             // discreteTag[j].State6 = "";
             // discreteTag[j].State7 = "";
-            // discreteTag[j].State0AlarmPriority = 0;
-            // discreteTag[j].State1AlarmPriority = 0;
-            // discreteTag[j].State2AlarmPriority = 0;
-            // discreteTag[j].State3AlarmPriority = 0;
-            // discreteTag[j].State4AlarmPriority = 0;
-            // discreteTag[j].State5AlarmPriority = 0;
-            // discreteTag[j].State6AlarmPriority = 0;
-            // discreteTag[j].State7AlarmPriority = 0;
         }
         for ( int j = 0; j < text_tag_num; j++ )
         {
