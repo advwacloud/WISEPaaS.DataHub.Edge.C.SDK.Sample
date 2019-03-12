@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 	TOPTION_STRUCT options;
 	options.AutoReconnect = true;
 	options.ReconnectInterval = 1000;
-	options.ScadaId = "c9851920-ca7f-4cfd-964a-1969aef958f6";
+	options.ScadaId = "1cd2fd22-9eb6-4c6e-9c59-73c4dd4088ad";
 	options.Heartbeat = 60;
 	options.DataRecover = true;
 	options.ConnectType = DCCS; 
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     switch (options.ConnectType)
 	{
 		case 1: // DCCS
-			options.DCCS.CredentialKey = "9b03e5524c70b6e4c503173c6553abrh";
+			options.DCCS.CredentialKey = "442a41baee49f2c845155ffa9668d52w";
 			options.DCCS.APIUrl = "https://api-dccs.wise-paas.com/";
 			break;
 
@@ -266,6 +266,7 @@ int main(int argc, char *argv[]) {
 
         SendData(data);
     }
+    
     
 /* release */
     free(device);
