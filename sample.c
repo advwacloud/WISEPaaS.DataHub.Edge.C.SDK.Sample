@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 	TOPTION_STRUCT options;
 	options.AutoReconnect = true;
 	options.ReconnectInterval = 1000;
-	options.ScadaId = "1cd2fd22-9eb6-4c6e-9c59-73c4dd4088ad";
+	options.ScadaId = "1cd2fd22-9eb6-4c6e-9c59-73c4dd4088ad"; // your scada Id
 	options.Heartbeat = 60;
 	options.DataRecover = true;
 	options.ConnectType = DCCS; 
@@ -107,8 +107,8 @@ int main(int argc, char *argv[]) {
     switch (options.ConnectType)
 	{
 		case 1: // DCCS
-			options.DCCS.CredentialKey = "442a41baee49f2c845155ffa9668d52w";
-			options.DCCS.APIUrl = "https://api-dccs.wise-paas.com/";
+			options.DCCS.CredentialKey = "442a41baee49f2c845155ffa9668d52w"; // your CredentialKey
+			options.DCCS.APIUrl = "https://api-dccs.wise-paas.com/"; 
 			break;
 
 		case 0: // MQTT
@@ -131,7 +131,6 @@ int main(int argc, char *argv[]) {
     config.BackupIP= NULL;
     config.PrimaryPort = 1883;
     config.BackupPort = 1883;
-
     config.Type = 1;
 
     int device_num = 1, analog_tag_num = 10, discrete_tag_num = 10, text_tag_num = 10;
@@ -146,6 +145,9 @@ int main(int argc, char *argv[]) {
     char *simDevName = NULL;
     char *simValue = NULL;
 
+    bool arraySample = true;
+    int array_size = 3; 
+    
     for (int i = 0; i < device_num; i++){
         for ( int j = 0; j < analog_tag_num; j++ )
         {
@@ -153,7 +155,9 @@ int main(int argc, char *argv[]) {
             analogTag[j].Name = simTagName;    
             analogTag[j].Description = "description_update";          
             analogTag[j].ReadOnly = false;
-            // analogTag[j].ArraySize = 0;
+
+            // analogTag[j].ArraySize = array_size;   /* used for array tag */
+
             // analogTag[j].AlarmStatus = false;
             // analogTag[j].SpanHigh = 1000;
             // analogTag[j].SpanLow = 0;
@@ -165,9 +169,11 @@ int main(int argc, char *argv[]) {
         {
             asprintf(&simTagName, "%s_%d", "TagName_dis", j);
             discreteTag[j].Name = simTagName;
+
+            // discreteTag[j].ArraySize = 0;    /* used for array tag */
+
             // discreteTag[j].Description = "description_d";
             // discreteTag[j].ReadOnly = false;
-            // discreteTag[j].ArraySize = 0;
             // discreteTag[j].AlarmStatus = false;
             // discreteTag[j].State0 = "0";
             // discreteTag[j].State1 = "1";
@@ -223,13 +229,13 @@ int main(int argc, char *argv[]) {
 
     status.DeviceList = dev_list;
 
-
 /* Set Data Content */
     int tag_num = 100;
     TEDGE_DATA_STRUCT data;
 
     PTEDGE_DEVICE_STRUCT data_device = malloc(device_num * sizeof(struct EDGE_DEVICE_STRUCT));
     PTEDGE_TAG_STRUCT data_tag = malloc(tag_num * sizeof(struct EDGE_TAG_STRUCT));
+    PTEDGE_ARRAY_TAG_STRUCT data_array_tag = malloc(3 * sizeof(struct EDGE_ARRAY_TAG_STRUCT));
 
 /* Use SDK API */
     Constructor(options);
@@ -241,19 +247,31 @@ int main(int argc, char *argv[]) {
     SendDeviceStatus(status);
  
     int value = 0; 
+
     while(1){
-        if(value >=1000){value =0;}
+
+        if( value >= 1000 ){ value =0; } // simulation values 0 ~ 1000
         value ++;
-        nsleep(1000);
+        
+        nsleep(1000); // send simulation per sec
 
         for(int i = 0; i < device_num; i++){
             for ( int j = 0; j < tag_num; j++ ){
 
                 asprintf(&simTagName, "%s_%d", "TagName_ana", j);
                 data_tag[j].Name = simTagName;
+        
+		        asprintf(&simValue, "%d", value);
+	            data_tag[j].Value = simValue;
 
-                asprintf(&simValue, "%d", value);
-                data_tag[j].Value = simValue;
+                /* array tag data */
+                //    for(int k = 0; k< array_size; k++){
+                //       asprintf(&simValue, "%d", value);
+                //       data_array_tag[k].Index = k;
+                //           data_array_tag[k].Value = simValue;
+                //        }
+                //    data_tag[j].ArraySize = array_size;
+                //    data_tag[j].ArrayList = data_array_tag;
             }
             data_device[i].TagNumber = tag_num;
             data_device[i].TagList = data_tag;
@@ -266,7 +284,6 @@ int main(int argc, char *argv[]) {
 
         SendData(data);
     }
-    
     
 /* release */
     free(device);
