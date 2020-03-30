@@ -8,7 +8,7 @@
 #include <dlfcn.h>
 #include <string.h>
 
-#include "WISEPaaS.h"
+#include "DatahubEdge.h"
 
 int nsleep(long miliseconds)
 {
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     char *error;
 
     void *handle;
-    handle = dlopen ("./WISEPaaS.so.1.0.0", RTLD_LAZY);
+    handle = dlopen ("./WISEPaaS.Datahub.Edge.so.1.0.2", RTLD_LAZY);
 
     if (!handle) {
         fputs (dlerror(), stderr);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 	TOPTION_STRUCT options;
 	options.AutoReconnect = true;
 	options.ReconnectInterval = 1000;
-	options.NodeId = "60a1fe39-dc35-4a8f-bd63-b285eb4cde75"; // your scada Id
+	options.NodeId = "1cd2fd22-9eb6-4c6e-9c59-73c4dd4088ad"; // your scada Id
 	options.Heartbeat = 60;
 	options.DataRecover = true;
 	options.ConnectType = DCCS; 
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     switch (options.ConnectType)
 	{
 		case 1: // DCCS
-			options.DCCS.CredentialKey = "82cf02ae5a0112306d6b2b9ea3e184i8"; // your CredentialKey
+			options.DCCS.CredentialKey = "442a41baee49f2c845155ffa9668d52w"; // your CredentialKey
 			options.DCCS.APIUrl = "https://api-dccs.wise-paas.com/"; 
 			break;
 
