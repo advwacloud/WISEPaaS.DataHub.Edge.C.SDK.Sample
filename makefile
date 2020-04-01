@@ -1,6 +1,6 @@
 all: openvpn build
 
-build: WISEPaaS.Datahub.Edge.so.1.0.2
+build: DatahubEdge.so.1.0.2
 	gcc sample.c -ldl -g -o sample -std=c99
 
 cJSON.o: cJSON.c
