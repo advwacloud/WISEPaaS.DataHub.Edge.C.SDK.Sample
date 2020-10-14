@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     char *error;
 
     void *handle;
-    handle = dlopen ("./DatahubEdge.so.1.0.2", RTLD_LAZY);
+    handle = dlopen ("./DatahubEdge.so.1.0.3", RTLD_LAZY);
 
     if (!handle) {
         fputs (dlerror(), stderr);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 	TOPTION_STRUCT options;
 	options.AutoReconnect = true;
 	options.ReconnectInterval = 1000;
-	options.NodeId = "f9710319-ea2f-4eb3-82a5-3b7b7951e036"; // your scada Id
+	options.NodeId = "YOUR_NODE_ID"; // your node Id
 	options.Heartbeat = 60;
 	options.DataRecover = true;
 	options.ConnectType = MQTT; // set your connect type: DCCS or MQTT
@@ -108,12 +108,12 @@ int main(int argc, char *argv[]) {
     switch (options.ConnectType)
 	{
 		case 1: // DCCS
-			options.DCCS.CredentialKey = "1a135fa40dc89d3f02a0a4354b117fkk"; // your CredentialKey
-			options.DCCS.APIUrl = "https://api-dccs-ensaas.sa.wise-paas.com/"; 
+			options.DCCS.CredentialKey = "YOUR_CREDENTIAL_KEY"; // your CredentialKey
+			options.DCCS.APIUrl = "YOUR_API_URL";  // your api url
 			break;
 
 		case 0: // MQTT
-			options.MQTT.HostName = "PC030403";
+			options.MQTT.HostName = "YOUR_MQTT_HOST";
 			options.MQTT.Port = 1883;
 			options.MQTT.Username = "admin";
 			options.MQTT.Password = "admin";
